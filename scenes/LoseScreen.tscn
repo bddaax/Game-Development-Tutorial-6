@@ -1,10 +1,18 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene format=3 uid="uid://drvwx5mqiewa1"]
 
-[ext_resource path="res://assets/dead.jpg" type="Texture2D" id=1]
+[ext_resource type="Texture2D" uid="uid://c5yo330ec12i1" path="res://assets/you_lose.jpg" id="2_aeugc"]
 
-[node name="LoseScreen" type="Node2D"]
+[sub_resource type="GDScript" id="GDScript_5ma5d"]
+script/source = "extends Node2D
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2( 512, 320 )
-scale = Vector2( 0.76, 0.76 )
-texture = ExtResource( 1 )
+func _ready():
+	await get_tree().create_timer(2.0).timeout  # Optional delay
+	get_tree().change_scene_to_file(Global.get_last_scene())
+	
+"
+
+[node name="LoseScreen" type="Node2D" unique_id=82356108]
+script = SubResource("GDScript_5ma5d")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=105341741]
+texture = ExtResource("2_aeugc")
