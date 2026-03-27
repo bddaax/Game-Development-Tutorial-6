@@ -6,26 +6,29 @@ extends CharacterBody2D
 @export var max_jumps: int = 6
 
 var current_jumps: int = 0
-var start_position: Vector2 
+var start_position: Vector2
+var is_dead: bool = false
 
-# Pastikan menggunakan $LoseScreen (besar/kecil hurufnya harus sama persis!)
-@onready var lose_screen = $LoseScreen 
+# Map zoom state
+var map_zoomed_out: bool = false
+const ZOOM_NORMAL := Vector2(1.0, 1.0)
+const ZOOM_OUT    := Vector2(0.25, 0.25)
 
 func _ready():
 	start_position = global_position
-	# Sekarang Godot pasti menemukan node-nya dan bisa melakukan hide()
-	lose_screen.hide()
 
 func get_input():
+	if is_dead:
+		return
 	velocity.x = 0
-	
+
 	if is_on_floor():
 		current_jumps = 0
-		
+
 	if Input.is_action_just_pressed("jump") and current_jumps < max_jumps:
 		velocity.y = jump_speed
-		current_jumps += 1 
-		
+		current_jumps += 1
+
 	if Input.is_action_pressed("right"):
 		velocity.x += speed
 	if Input.is_action_pressed("left"):
@@ -37,6 +40,10 @@ func _physics_process(delta):
 	move_and_slide()
 
 func _process(_delta):
+	if is_dead:
+		return
+
+	# Animasi
 	if not is_on_floor():
 		$Animator.play("Jump")
 	elif velocity.x != 0:
@@ -44,30 +51,47 @@ func _process(_delta):
 	else:
 		$Animator.play("Idle")
 
-	if velocity.x != 0:
-		if velocity.x > 0:
-			$Sprite2D.flip_h = false
-		else:
-			$Sprite2D.flip_h = true
+	if velocity.x > 0:
+		$Sprite2D.flip_h = false
+	elif velocity.x < 0:
+		$Sprite2D.flip_h = true
 
-# Fungsi ini dipanggil dari script Rintangan
+	# --- TOGGLE MAP (M key) ---
+	if Input.is_action_just_pressed("toggle_map") and Global.has_map:
+		_toggle_map_zoom()
+
+func _toggle_map_zoom():
+	map_zoomed_out = !map_zoomed_out
+	var camera: Camera2D = $Camera2D
+	var target_zoom = ZOOM_OUT if map_zoomed_out else ZOOM_NORMAL
+	var tween = create_tween()
+	tween.tween_property(camera, "zoom", target_zoom, 0.4)\
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
 func kalah():
-	# 1. Munculkan gambar You Lose
-	lose_screen.show()
-	
-	# 2. Hentikan pergerakan player
+	if is_dead:
+		return
+	is_dead = true
 	set_physics_process(false)
-	
-	# 3. Tunggu 2 detik
-	await get_tree().create_timer(2.0).timeout
-	
-	# 4. Pindahkan kembali ke posisi awal
-	global_position = start_position
-	
-	# 5. Sembunyikan gambar You Lose dan izinkan player gerak lagi
-	lose_screen.hide()
-	set_physics_process(true)
 
+	if map_zoomed_out:
+		map_zoomed_out = false
+		$Camera2D.zoom = ZOOM_NORMAL
 
-func _on_body_entered(body: Node2D) -> void:
-	pass # Replace with function body.
+	Global.lives -= 1
+
+	if Global.lives <= 0:
+		Global.lives = 0
+		Transition.change_scene_to_file("res://scenes/LoseScreen.tscn")
+	else:
+		await get_tree().create_timer(0.8).timeout
+		global_position = start_position
+		velocity = Vector2.ZERO
+
+		var scene = get_tree().get_current_scene()
+		for node in scene.get_children():
+			if node.has_method("reset"):
+				node.reset()
+
+		is_dead = false
+		set_physics_process(true)

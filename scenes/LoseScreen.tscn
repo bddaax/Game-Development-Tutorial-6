@@ -1,18 +1,87 @@
 [gd_scene format=3 uid="uid://drvwx5mqiewa1"]
 
-[ext_resource type="Texture2D" uid="uid://c5yo330ec12i1" path="res://assets/you_lose.jpg" id="2_aeugc"]
+[ext_resource type="Script" path="res://scenes/LoseScreen.gd" id="1_lose"]
 
-[sub_resource type="GDScript" id="GDScript_5ma5d"]
-script/source = "extends Node2D
+[node name="LoseScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lose")
 
-func _ready():
-	await get_tree().create_timer(2.0).timeout  # Optional delay
-	get_tree().change_scene_to_file(Global.get_last_scene())
-	
-"
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.03, 0.03, 1)
 
-[node name="LoseScreen" type="Node2D" unique_id=82356108]
-script = SubResource("GDScript_5ma5d")
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -180.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=105341741]
-texture = ExtResource("2_aeugc")
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 72
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="SubLabel" type="Label" parent="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+text = "You ran out of lives!"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="BRestart" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(260, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "TRY AGAIN"
+
+[node name="BMainMenu" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(260, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "MAIN MENU"
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BRestart" to="." method="_on_b_restart_pressed"]
+[connection signal="mouse_entered" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BRestart" to="." method="_on_b_restart_mouse_entered"]
+[connection signal="mouse_exited" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BRestart" to="." method="_on_b_restart_mouse_exited"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BMainMenu" to="." method="_on_b_main_menu_pressed"]
+[connection signal="mouse_entered" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BMainMenu" to="." method="_on_b_main_menu_mouse_entered"]
+[connection signal="mouse_exited" from="MarginContainer/HBoxContainer/HBoxContainer/VBoxContainer/BMainMenu" to="." method="_on_b_main_menu_mouse_exited"]

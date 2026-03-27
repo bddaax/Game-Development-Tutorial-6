@@ -19,6 +19,11 @@ func _physics_process(delta):
 			position.y = start_y - max_height # Pasin di batas atas
 			is_moving = false # Berhenti kalau sudah sampai
 
+# Dipanggil saat player mati agar platform kembali ke posisi awal
+func reset():
+	is_moving = false
+	position.y = start_y
+
 func _on_area_2d_body_entered(body):
 	# Gunakan 'is CharacterBody2D' agar lebih fleksibel dibanding cek nama
 	if body is CharacterBody2D: 
@@ -26,5 +31,4 @@ func _on_area_2d_body_entered(body):
 
 func _on_area_2d_body_exited(body):
 	if body is CharacterBody2D:
-		# Opsional: kalau mau dia tetap di atas, jangan ubah is_moving jadi false di sini
 		pass

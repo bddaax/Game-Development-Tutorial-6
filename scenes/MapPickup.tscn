@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://mappickup001"]
+
+[ext_resource type="Script" uid="uid://cwwfns2vbhcyu" path="res://scenes/map_pickup.gd" id="1_mpickup"]
+[ext_resource type="Texture2D" uid="uid://c0c4avuoeqj5v" path="res://assets/kenney_platformerpack/Spritesheets/spritesheet_tiles.png" id="2_skxfu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_map"]
+atlas = ExtResource("2_skxfu")
+region = Rect2(511.58112, 767.60443, 127.45892, 128.43933)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mpickup"]
+radius = 32.0
+
+[node name="MapPickup" type="Area2D" unique_id=185915951]
+script = ExtResource("1_mpickup")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=674164483]
+scale = Vector2(0.5, 0.5)
+texture = SubResource("AtlasTexture_map")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=894589872]
+shape = SubResource("CircleShape2D_mpickup")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
